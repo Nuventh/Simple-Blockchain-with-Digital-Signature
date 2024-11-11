@@ -133,7 +133,7 @@ blockchain = Blockchain()
 alice = User("Alice")
 bob = User("Bob")
 users = [alice, bob]
-num_transactions = 3
+num_transactions = 5
 
 # Generates and adds 3 blocks to the blockchain.
 for i in range(1, 4):
