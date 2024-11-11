@@ -20,7 +20,7 @@ class User:
     # Signs a transaction with the user's private key.
     def sign_transaction(self, data):
         return rsa.sign(data.encode(), self.private_key, 'SHA-256')
-
+        
 class MerkleTree:
     # Initializes the Merkle tree with transactions and determines the root hash.
     def __init__(self, transactions):
@@ -28,20 +28,27 @@ class MerkleTree:
         self.root = self.build_merkle_root(transactions)
 
     # Creates the Merkle root based on a list of transactions.
-    def build_merkle_root(self, transactions):  
+    def build_merkle_root(self, transactions):
+        # Base case: if no transactions, return hash of an empty string
         if len(transactions) == 0:
             return hash_data("")
-
-        # Appends an empty hash for odd transactions.
-        if len(transactions) % 2 != 0:  
+        
+        # If we have only one transaction, that's our root (single transaction tree)
+        if len(transactions) == 1:
+            return hash_data(transactions[0])
+        
+        # If there's an odd number of transactions, append an empty hash
+        if len(transactions) % 2 != 0:
             transactions.append("")
 
-        # Creates the next level of transactions.
-        next_level = [hash_data(transactions[i] + transactions[i+1]) 
-                      for i in range(0, len(transactions), 2)]
+        # Create the next level by pairing up transactions and hashing them
+        next_level = []
+        for i in range(0, len(transactions), 2):
+            combined_hash = hash_data(transactions[i] + transactions[i + 1])
+            next_level.append(combined_hash)
         
-        # Recursive call for the next level.
-        return self.build_merkle_root(next_level) if len(next_level) > 1 else next_level[0]
+        # Recursively build the tree until the root is found
+        return self.build_merkle_root(next_level)
 
 class Block:
     # Initializes a block with an index, transactions, previous hash, and timestamp.
